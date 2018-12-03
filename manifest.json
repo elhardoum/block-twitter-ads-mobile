@@ -1,0 +1,21 @@
+{
+  "content_scripts": [
+    {
+      "js": [
+        "./src/compat.js",
+        "./src/content.js"
+      ],
+      "matches": [
+        "https://mobile.twitter.com/*"
+      ],
+      "run_at": "document_end",
+      "all_frames": true
+    }
+  ],
+  "description": "Block Twitter ads on their mobile site.",
+  "manifest_version": 2,
+  "name": "Block Twitter Mobile Ads",
+  "short_name": "Block Twitter Mobile Ads",
+  "permissions": [],
+  "version": "0.1"
+}
