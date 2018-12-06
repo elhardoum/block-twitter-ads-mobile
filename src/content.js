@@ -12,55 +12,38 @@
     // more ad placements as I continue to use the mobile version of Twitter on a regular basis. 
     const ADS_CONTAINERS = ['article[role="article"]', '[data-testid="UserCell"]']
 
-    const wait_for_node = params =>
+    const wait_for_node = selector =>
     {
         return new Promise((resolve, reject) =>
         {
-            return new MutationObserver(function(mutations)
+            return new MutationObserver(function()
             {
                 let el
 
-                if ( params.multiple ) {
-                    params.selector = ( params.selector || '#' + params.id ) + ':not(.btam)'
-                    params.id = null
+                if ( el = document.querySelector(selector) ) {
+                    resolve(el)
+                    this.disconnect()
                 }
-
-                if ( params.id ) {
-                    el = document.getElementById(params.id)
-                } else if ( params.selector ) {
-                    el = document.querySelector(params.selector)
-                }
-
-                if ( el ) {
-                    if ( ! params.multiple ) {
-                        this.disconnect()
-                        resolve(el)
-                    } else if ( ! el.classList.contains('btam') ) {
-                        el.classList.add('btam')
-                        resolve(el)
-                    }
-                }
-            }).observe(params.parent || document, {
-                subtree: !!params.recursive,
+            }).observe(document.body, {
+                subtree: true,
                 childList: true,
             })
         })
     }
 
+    const handle_ad_icon = item => ADS_CONTAINERS.map( selector => item.closest(selector) ).filter( Boolean ).map( el => el.remove() )
+
     (async function run()
     {
-        let item = await wait_for_node({
-            selector: PROMOTED_ICON_SELECTOR,
-            parent: document.body,
-            recursive: true,
-            multiple: true
-        })
+        // check for existing DOM elements before using mutation observers
+        document.querySelector( PROMOTED_ICON_SELECTOR )
+          && handle_ad_icon( document.querySelector( PROMOTED_ICON_SELECTOR ) )
 
-        ADS_CONTAINERS.map( selector => item.closest(selector) )
-          .filter( Boolean )
-          .map( el => el.remove() )
+        try {
+            handle_ad_icon( await wait_for_node( PROMOTED_ICON_SELECTOR ) )
+        } catch ( e ) { console.error( e ) }
 
-        // for multiple elements, once the promise is resolved, send another promise
+        // for multiple elements, once the promise is resolved/rejected, send another promise
         run()
     })()
 })()
