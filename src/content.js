@@ -33,7 +33,7 @@
 
     const handle_ad_icon = item => ADS_CONTAINERS.map( selector => item.closest(selector) ).filter( Boolean ).map( el => el.remove() )
 
-    (async function run()
+    ;(async function run()
     {
         // check for existing DOM elements before using mutation observers
         document.querySelector( PROMOTED_ICON_SELECTOR )
